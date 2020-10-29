@@ -1,3 +1,9 @@
+This is a trivial application using React and the DCP Client.
+
+Docs for DCP are available at https://dcp.dev
+DCP-Client is available as `npm i dcp-client`, or you can use the version hosted at https://scheduler.distributed.computer/dcp-client/dcp-client.js
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

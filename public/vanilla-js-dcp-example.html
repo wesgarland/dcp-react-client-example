@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://scheduler.distributed.computer/dcp-client/dcp-client.js"></script>
+    <script>
+      const compute = dcp.compute;
+      const $ = document.querySelector.bind(document);
+
+      /** Work Function: Transform lowercase letters to uppercase letters.
+       *                 This function is stringified and executed on remote workers.
+       */
+      function workFn(letter) {
+        progress(); /* mandatory, must be called ~ every 30s */
+        return letter.toUpperCase();
+      }
+
+      /** Generate input set, instantiate job handle, attach events, execute the job, and
+       *  await the result set. Once all results have been computed, reasssemble the string
+       *  and alert it.
+       */
+      async function go() {
+        let inputSet = Array.from($('#inputString').value);
+        let job = compute.for(inputSet, workFn);
+
+        job.on('readystatechange', (ev) => $('#taLeft').value += '\nReady State:' + ev);
+        job.on('status',           (ev) => $('#taLeft').value += '\nStatus:' + Object.entries(ev).join(' ').replace(/,/g,': '));
+        job.on('result',           (ev) => $('#taRight').value += Object.entries(ev).join(' ').replace(/,/g,': '));
+
+        let resultSet = await job.exec();              /**< execute job and wait for result set */
+        let allCaps = Array.from(resultSet).join('');  /**< assemble output set into new string */
+        alert(allCaps);
+      }              
+    </script>
+  </head>
+  <body>
+    <p>
+      Enter a string to change to uppercase via the Distributed Computer:
+      <input type="text" id="inputString"><input type="button" value="Distribute" onclick="go()">
+    </p>
+    <div style='display: inline-block'>Status Events<br>      <textarea cols="65" rows="25" id="taLeft"></textarea></div>
+    <div style='display: inline-block'>Individual Results<br> <textarea cols="65" rows="25" id="taRight"></textarea></div>
+  </body>
+</html>
+
